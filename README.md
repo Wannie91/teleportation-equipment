@@ -1,6 +1,6 @@
-#Teleportation Equipment
+# Teleportation Equipment
 
-##Version
+## Version
 1.0.0
 
 ## Description
