@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 04.01.2023
+  Changes:
+    - Changed the required Energy from 150MJ to 750KJ. (Equivalent to the output of one fusion reactor)
+  Compatibility:
+    - Added Space Exploration's teleportation technology to the pre-requistes of this mod
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 02.01.2023
+  Changes:
+    - Changed the energy input from tertiary to primary-input. 
+    - When in cheat mode, the equipment will allways be charged.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 20.09.2022
+  Changes:
+    - Initial Release

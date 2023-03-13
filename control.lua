@@ -29,6 +29,10 @@ local teleport_equipment_inserted = function(event)
         player.set_shortcut_available("teleport-player", true)
     end
 
+    if player.cheat_mode then 
+        event.equipment.energy = event.equipment.max_energy
+    end
+
     global.player_data[event.player_index] = player
  
 end
@@ -79,7 +83,7 @@ local teleport_player = function(event)
 
                 for _, equipment in pairs(player.character.grid.equipment) do 
 
-                    if equipment.name == "teleportation-equipment" then 
+                    if equipment.name == "teleportation-equipment" and not player.cheat_mode then 
                         equipment.energy = 0
                     end
 
@@ -137,20 +141,22 @@ local check_charge_status = function()
 
         local charged = true
 
-        for _, equipment in pairs(player.character.grid.equipment) do 
+        if player.character and player.character.grid then 
 
-            if equipment.name == "teleportation-equipment" then 
+            for _, equipment in pairs(player.character.grid.equipment) do 
 
-                if equipment.energy < equipment.max_energy then 
-                    charged = false 
-                end
-            end        
+                if equipment.name == "teleportation-equipment" then 
+
+                    if equipment.energy < equipment.max_energy then 
+                        charged = false 
+                    end
+                end        
+            end
+
+            if charged and not player.is_shortcut_available("teleport-player") then 
+                player.set_shortcut_available("teleport-player", true)
+            end
         end
-
-        if charged and not player.is_shortcut_available("teleport-player") then 
-            player.set_shortcut_available("teleport-player", true)
-        end
-
     end
 
 end

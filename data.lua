@@ -114,8 +114,8 @@ data:extend({
 		energy_source = 
 		{
 			type = "electric",
-			buffer_capacity = "150MJ",
-			usage_priority = "tertiary",
+			buffer_capacity = "750KJ",
+			usage_priority = "primary-input",
 		},
 	},
 	{
