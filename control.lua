@@ -1,23 +1,48 @@
 local init = function() 
 
-    if not global.player_data then 
-        global.player_data = {}
+    if not storage.player_data then 
+        storage.player_data = {}
     end
 
     if game.forces["player"].technologies["modular-armor"].researched then 
         game.forces["player"].recipes["teleportation-equipment"].enabled = true 
+    else
+        for _, player in pairs(game.players) do 
+            player.set_shortcut_available("teleport-player", false)
+        end
     end
 
 end
 
-local get_distance = function(pos1, pos2)
-    
-    local px = pos1.x - pos2.x
-    local py = pos1.y - pos2.y
+local on_load = function()
 
-    return (px * px + py * py) ^ 0.5
+    data = storage.player_data or data
+    storage.player_data = data
 
 end
+
+local get_distance = function(pos1, pos2)
+
+    local x = pos1.x - pos2.x
+    local y = pos1.y - pos2.y
+
+    return (x * x + y * y) ^ 0.5
+end
+
+-- local teleportation_equipment_inserted = function(event)
+
+--     if event.equipment.name ~= "teleportation-equipment" then return end
+
+--     local player = game.get_player(event.player_index)
+
+--     if not storage.player_data[player.index] then
+--         storage.player_data[player.index][event.equipment.unique_id] = event.equipment
+--     end
+
+--     if player and event.grid.find("teleportation-equipment") then
+--         player.set_shortcut_available("teleport-player", true)
+--     end
+-- end
 
 local teleport_equipment_inserted = function(event)
 
@@ -33,28 +58,25 @@ local teleport_equipment_inserted = function(event)
         event.equipment.energy = event.equipment.max_energy
     end
 
-    global.player_data[event.player_index] = player
+    storage.player_data[event.player_index] = player
  
 end
 
-local teleport_equipment_removed = function(event)
-
+local teleportation_equipment_removed = function(event)
     if event.equipment ~= "teleportation-equipment" then return end
 
     local player = game.get_player(event.player_index)
 
-    if not event.grid.find("teleportation-equipment") then 
+    if player and not event.grid.find("teleportation-equipment") then
         player.set_shortcut_available("teleport-player", false)
-        global.player_data[event.player_index] = player
     end
-
 end
 
 local teleport_player = function(event)
 
     local player = game.get_player(event.player_index)
 
-    if player.character.grid and player.character.grid.find("teleportation-equipment") and not player.driving then 
+    if player.character and player.character.grid and player.character.grid.find("teleportation-equipment") and not player.driving then 
 
         local charged = true
         local max_teleport_distance = 0
@@ -64,9 +86,9 @@ local teleport_player = function(event)
             if equipment.name == "teleportation-equipment" then 
 
                 if equipment.energy < equipment.max_energy then 
-                    charged = false 
+                    charged = false
                 else 
-                    max_teleport_distance = max_teleport_distance + settings.player["max-teleportation-distance"].value
+                    max_teleport_distance = max_teleport_distance + settings.get_player_settings(player.index)["max-teleportation-distance"].value
                 end
 
             end        
@@ -78,7 +100,7 @@ local teleport_player = function(event)
 
                 player.play_sound({ path = "teleportation-sound", volume_modifier = 0.75 })
                 rendering.draw_animation({animation = "teleportation-effect", target = player.character, surface = player.character.surface, time_to_live=60})
-                player.teleport(event.cursor_position)
+                player.character.teleport(event.cursor_position)
                 player.set_shortcut_available("teleport-player", false)
 
                 for _, equipment in pairs(player.character.grid.equipment) do 
@@ -88,6 +110,8 @@ local teleport_player = function(event)
                     end
 
                 end
+            else
+                player.create_local_flying_text{create_at_cursor = true, text = {"", "Teleport Coordinates too far away"}, speed = 0.1}
             end
 
             if settings.global["teleportation-message"].value then 
@@ -95,8 +119,12 @@ local teleport_player = function(event)
             end
 
         else
-            player.print("Equipment needs to be fully charged for teleportation")
+            player.create_local_flying_text{create_at_cursor = true, text = {"", "Equipment needs to be fully charged for teleportation"}, speed = 0.1}
         end
+    elseif player.driving then 
+        player.create_local_flying_text{create_at_cursor = true, text = {"" ,"Can't teleport while driving"}, speed = 0.1}
+    elseif player.character and player.character.grid and not player.character.grid.find("teleportation-equipment") then
+        player.create_local_flying_text{create_at_cursor = true, text = {"", "No teleportation module equipped"}, speed = 0.1}
     end
 
 end
@@ -137,7 +165,9 @@ end
 
 local check_charge_status = function()
 
-    for _, player in pairs(global.player_data) do 
+    for _, player in pairs(storage.player_data) do
+
+        player.set_shortcut_available("teleport-player", false)
 
         local charged = true
 
