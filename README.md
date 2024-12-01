@@ -11,5 +11,7 @@ A power armour equipment which allows players to teleport some distance (Default
 
 - Max Teleportation Distance = Set maximum teleportation distance per Module
 
+- Required Energy to Teleport = How much energy is required for one teleport
+
 ## Known Issues
 
