@@ -10,8 +10,9 @@ data:extend({
         consuming = "none",
     },
     {
-        type = "battery-equipment",
+        type = "active-defense-equipment", 
         name = "teleportation-equipment",
+        automatic = false,
         categories = {"armor"},
         sprite = {
             filename = "__TeleportationEquipment__/graphics/teleportation-equipment.png",
@@ -27,40 +28,97 @@ data:extend({
         },
         energy_source = {
             type = "electric",
-            buffer_capacity = "1.5MJ",
+            buffer_capacity = "1.5MW",
             usage_priority = "primary-input",
             input_flow_limit = "750kW"
         },
+        take_result = "teleportation-equipment",
+        attack_parameters = {
+            type = "projectile",
+            ammo_category = "capsule",
+            cooldown = 30,
+            range = 1000,
+            -- sound = {
+            --     filename = "__TeleportationEquipment__/graphics/teleport.ogg", 
+            --     volume = 0.7
+            -- },
+            ammo_type =
+            {
+                target_type = "entity",
+                -- energy_consumption = "750kW",
+                energy_consumption = settings.startup["required-energy-to-teleport"].value,
+                target_filter  = { "character" },
+                action =
+                {
+                    {
+                        type = "area",
+                        radius = 1000,
+                        force = "same",
+                        action_delivery = {
+                            type = "instant",
+                            target_effects = {
+                                {
+                                    type = "damage",
+                                    damage = { type = "physical", amount = 0 }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            -- animation = {
+            --     name = "teleportation-effect",
+            --     filename = "__TeleportationEquipment__/graphics/teleportation_effect.png",
+            --     width = 256,
+            --     height = 256,
+            --     line_length = 4,
+            --     frame_count = 15,
+            --     animation_speed = 0.5,
+            --     draw_as_glow = true,
+            -- }
+        }
     },
     {
         type = "capsule",
         name = "teleportation-capsule",
         icon = "__TeleportationEquipment__/graphics/teleportation-equipment.png",
-        flags = {"only-in-cursor", "not-stackable", "spawnable"},    
-        capsule_action = {
-            type = "use-on-self",
+        flags = {"only-in-cursor", "not-stackable", "spawnable"},
+        -- capsule_action = {
+        --     type = "equipment-remote",
+        --     equipment = "teleportation-equipment",
+        --     color = {0, 0, 1 }
+        -- },
+        capsule_action = 
+        {
+            type = "throw",
             attack_parameters = {
                 type = "projectile",
                 ammo_category = "capsule",
                 cooldown = 30,
                 range = 1000,
-                -- sound = {
-                --     filename = "__TeleportationEquipment__/graphics/teleport.ogg", 
-                --     volume = 0.7
-                -- },
+                sound = {
+                    filename = "__TeleportationEquipment__/graphics/teleport.ogg", 
+                    volume = 0.7
+                },
                 ammo_type =
                 {
-                    target_type = "position",
+                    target_type = "entity",
+                    -- energy_consumption = "750kW",
+                    energy_consumption = settings.startup["required-energy-to-teleport"].value,
+                    target_filter  = { "character" },
                     action =
                     {
                         {
-                            type = "direct",
-                            action_delivery = {
+                            type = "area",
+                            radius = 1000,
+                            force = "same",
+                            action_delivery = 
+                            {
                                 type = "instant",
                                 target_effects = {
                                     {
                                         type = "damage",
-                                        damage = { type = "physical", amount = 0 }
+                                        damage = { type = "physical", amount = 10 }
                                     }
                                 }
                             }
@@ -76,7 +134,7 @@ data:extend({
                     frame_count = 15,
                     animation_speed = 0.5,
                     draw_as_glow = true,
-                },
+                }
             }
         },
         subgroup = "spawnables",
@@ -106,7 +164,6 @@ data:extend({
         {
             { type = "item", name = "battery", amount = 5 },
             { type = "item", name = "iron-plate", amount = 5 },
-            { type = "item", name = "copper-plate", amount = 5 },
             { type = "item", name = "advanced-circuit", amount = 5 },
         },
         results = {{ type = "item", name = "teleportation-equipment", amount = 1 }}
@@ -157,9 +214,9 @@ data:extend({
         type = "shortcut",
         name = "teleport-player",
         order = "a[teleport]",
-        action = "lua",
-        -- action = "spawn-item",
-        -- item_to_spawn = "teleportation-capsule",
+        -- action = "lua",
+        action = "spawn-item",
+        item_to_spawn = "teleportation-capsule",
         associated_control_input = "teleport-player",
         unavailable_until_unlocked = true,
         technology_to_unlock = "teleportation-equipment",
@@ -170,3 +227,4 @@ data:extend({
     }
 
 })
+
