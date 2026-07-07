@@ -1,8 +1,44 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.15
+Date: 06.07.2026
+  Features:
+    - Updated to Factorio 2.1
+  Changes:
+    - Changed max-teleportation-distance setting from runtime to startup to accurately reflect the range in the prototype
+    - Changed required-energy-to-teleport setting to double setting
+    - Changed value of required-energy-to teleleport from kW to MJ as the former was too cheap
+    - Changed the default value of required-energy-to-teleport from 750kW to 20MJ
+    - Changed the default range from 1000 to 500 tiles
+    - Added new setting that controls how fast the equipment recharges.
+  Optimizations:
+    - Changed the energy handling of the equipment. It should now properly recharge and use energy from batteries and reactors.
+  Compatibility:
+    - Removed a if case which should make the mod independent from quality
+---------------------------------------------------------------------------------------------------
+Version: 1.0.14
+Date: 29.10.2025
+  Bugfixes:
+    - Fixed crash when no teleportation equipment was equiped
+---------------------------------------------------------------------------------------------------
+Version: 1.0.13
+Date: 27.10.2025
+  Bugfixes:
+    - Fixed issue with teleportation distance not updating
+    - Fixed issue with wrong error message when not enough power
+---------------------------------------------------------------------------------------------------
+Version: 1.0.12
+Date: 24.10.2025
+  Bugfixes:
+    - Fixed missing locale
+    - Fixed Crash when displaying teleportation message
+---------------------------------------------------------------------------------------------------
 Version: 1.0.11
 Date: 14.11.2024
   Changes:
+    - Changed the equipment to active-defense-equipment type.
     - Thanks to Plexpt the mod now has chinese localization
+  Bugfixes:
+    - A lot of issues with cursor shouldn't happen anymore.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.10
 Date: 13.11.2024

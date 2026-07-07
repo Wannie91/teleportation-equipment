@@ -18,7 +18,7 @@ data:extend({
             filename = "__TeleportationEquipment__/graphics/teleportation-equipment.png",
             flags = {"icon"},
             priority = "extra-high-no-scale",
-            size = 128,
+            size = 64,
             scale = 0.5
         },
         shape = {
@@ -28,31 +28,28 @@ data:extend({
         },
         energy_source = {
             type = "electric",
-            buffer_capacity = "1.5MW",
-            usage_priority = "primary-input",
-            input_flow_limit = "750kW"
+            buffer_capacity = settings.startup["required-energy-to-teleport"].value .."MJ",
+            input_flow_limit = settings.startup["teleportation-recharging-speed"].value .."kW",
+            usage_priority = "secondary-input",
         },
         take_result = "teleportation-equipment",
-        attack_parameters = {
+        attack_parameters = 
+        {
             type = "projectile",
+            activation_type = "consume",
             ammo_category = "capsule",
             cooldown = 30,
-            range = 1000,
-            -- sound = {
-            --     filename = "__TeleportationEquipment__/graphics/teleport.ogg", 
-            --     volume = 0.7
-            -- },
+            range = settings.startup["max-teleportation-distance"].value,
             ammo_type =
             {
                 target_type = "entity",
-                -- energy_consumption = "750kW",
-                energy_consumption = settings.startup["required-energy-to-teleport"].value,
+                energy_consumption = settings.startup["required-energy-to-teleport"].value .. "MJ",
                 target_filter  = { "character" },
                 action =
                 {
                     {
                         type = "area",
-                        radius = 1000,
+                        radius = settings.startup["max-teleportation-distance"].value,
                         force = "same",
                         action_delivery = {
                             type = "instant",
@@ -66,16 +63,6 @@ data:extend({
                     }
                 }
             },
-            -- animation = {
-            --     name = "teleportation-effect",
-            --     filename = "__TeleportationEquipment__/graphics/teleportation_effect.png",
-            --     width = 256,
-            --     height = 256,
-            --     line_length = 4,
-            --     frame_count = 15,
-            --     animation_speed = 0.5,
-            --     draw_as_glow = true,
-            -- }
         }
     },
     {
@@ -83,34 +70,28 @@ data:extend({
         name = "teleportation-capsule",
         icon = "__TeleportationEquipment__/graphics/teleportation-equipment.png",
         flags = {"only-in-cursor", "not-stackable", "spawnable"},
-        -- capsule_action = {
-        --     type = "equipment-remote",
-        --     equipment = "teleportation-equipment",
-        --     color = {0, 0, 1 }
-        -- },
-        capsule_action = 
+        capsule_action =
         {
             type = "throw",
             attack_parameters = {
                 type = "projectile",
                 ammo_category = "capsule",
                 cooldown = 30,
-                range = 1000,
+                range = settings.startup["max-teleportation-distance"].value,
                 sound = {
-                    filename = "__TeleportationEquipment__/graphics/teleport.ogg", 
+                    filename = "__TeleportationEquipment__/graphics/teleport.ogg",
                     volume = 0.7
                 },
                 ammo_type =
                 {
                     target_type = "entity",
-                    -- energy_consumption = "750kW",
-                    energy_consumption = settings.startup["required-energy-to-teleport"].value,
+                    energy_consumption = settings.startup["required-energy-to-teleport"].value .. "MJ",
                     target_filter  = { "character" },
                     action =
                     {
                         {
                             type = "area",
-                            radius = 1000,
+                            radius = settings.startup["max-teleportation-distance"].value,
                             force = "same",
                             action_delivery = 
                             {
@@ -118,7 +99,7 @@ data:extend({
                                 target_effects = {
                                     {
                                         type = "damage",
-                                        damage = { type = "physical", amount = 10 }
+                                        damage = { type = "physical", amount = 0 }
                                     }
                                 }
                             }

@@ -5,7 +5,7 @@ local init = function()
     end
 
     for _, force in pairs(game.forces) do
-        if force.technologies["modular-armor"].researched then 
+        if force.technologies["modular-armor"].researched then
             force.recipes["teleportation-equipment"].enabled = true
         else
             -- for _, player in pairs(force) do
@@ -25,10 +25,10 @@ end
 
 local get_distance = function(pos1, pos2)
 
-    local x = pos1.x - pos2.x
-    local y = pos1.y - pos2.y
+    local x = pos2.x - pos1.x
+    local y = pos1.y - pos1.y
 
-    return (x * x + y * y ) ^ 0.5
+    return math.sqrt(x * x + y * y )
 
 end
 
@@ -42,43 +42,50 @@ local teleport_player = function(event)
         return
     end
 
-    if character and character.grid and character.grid.find({ name = "teleportation-equipment", quality = "normal" }) or
-                                        character.grid.find({ name = "teleportation-equipment", quality = "uncommon" }) or
-                                        character.grid.find({ name = "teleportation-equipment", quality = "rare"}) or
-                                        character.grid.find({ name = "teleportation-equipment", quality = "epic"}) or
-                                        character.grid.find({ name = "teleportation-equipment", quality = "legendary"}) then
-        
-                                            local maximum_distance = 0
-        local required_energy = 0
+    if character and character.grid then
+
+        local max_teleportation_distance = 0
+        local has_teleportation_equipped = false
 
         for _, equipment in pairs(character.grid.equipment) do
-            if equipment.name == "teleportation-equipment" and equipment.energy >= equipment.prototype.attack_parameters.ammo_type.energy_consumption then
-                maximum_distance = maximum_distance + ( equipment.prototype.attack_parameters.range + ( ( equipment.prototype.attack_parameters.range / 100 ) * (equipment.quality.level * 10 ) ) )
-            end
-        end
+            if equipment.name == "teleportation-equipment" then
+                has_teleportation_equipped = true
 
-        if player and get_distance(player.position, event.cursor_position) < maximum_distance then
-            
-            player.play_sound({ path = "teleportation-sound", volume_modifier = 0.75 })
-            character.teleport(event.cursor_position)
-            rendering.draw_animation({animation = "teleportation-effect", target = player.character, surface = player.character.surface, time_to_live=60})
-
-            for _, equipment in pairs(player.character.grid.equipment) do
-                if equipment.name == "teleportation-equipment" then 
-                    equipment.energy = equipment.energy - equipment.prototype.attack_parameters.ammo_type.energy_consumption
+                if equipment.energy >= equipment.prototype.attack_parameters.ammo_type.energy_consumption then
+                    max_teleportation_distance = max_teleportation_distance + equipment.prototype.attack_parameters.range
                 end
             end
-
-            if settings.global["global-teleportation-message"].value then
-                game.print({"", string.format("Player %s teleported to: [gps= %d, %d]", player.name, charplayeracter.position.x, player.position.y)})
-            end
-        elseif maximum_distance == 0 then
-            player.create_local_flying_text{create_at_cursor = true, text = {"", "Equipment needs to be fully charged for teleportation"}, speed = 0.1}
-        else
-            player.create_local_flying_text{create_at_cursor = true, text = {"", "Teleport Coordinates too far away"}, speed = 0.1}
         end
-    else
-        player.create_local_flying_text{create_at_cursor = true, text = {"", "No teleportation module equipped"}, speed = 0.1}
+
+        if has_teleportation_equipped then
+
+            if max_teleportation_distance ~= 0 then
+
+                if get_distance(player.position, event.cursor_position) <= max_teleportation_distance then
+                    character.teleport(event.cursor_position)
+                    rendering.draw_animation({animation = "teleportation-effect", target = player.character, surface = player.character.surface, time_to_live=60})
+                    player.play_sound({path = "teleportation-sound", volume_modifier = 0.75})
+
+                    for _, equipment in pairs(player.character.grid.equipment) do
+                        if equipment.name == "teleportation-equipment" then
+                            equipment.energy = equipment.energy - equipment.prototype.attack_parameters.ammo_type.energy_consumption
+                        end
+                    end
+
+                    if settings.global["global-teleportation-message"].value then
+                        game.print({"", string.format("Player %s teleported to: [gps= %d, %d]", player.name, player.position.x, player.position.y)})
+                    end
+
+                else
+                    player.create_local_flying_text{create_at_cursor = true, text = {"", "Teleportation Coordinates too far away"}, speed = 0.1}
+                end
+
+            else
+                player.create_local_flying_text{create_at_cursor = true, text = {"", "Not enough power to teleport"}, speed = 0.1}
+            end
+        else
+            player.create_local_flying_text{create_at_cursor = true, text = {"", "No teleportation module equipped"}, speed = 0.1}
+        end
     end
 
 end

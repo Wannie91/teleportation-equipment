@@ -1,9 +1,9 @@
 {
     "name": "TeleportationEquipment",
-    "version": "1.0.11",
+    "version": "1.0.15",
     "title": "Teleportation Equipment",
     "author": "Wannie",
-    "factorio_version": "2.0",
+    "factorio_version": "2.1",
     "dependencies": ["base"],
     "homepage": "https://forums.factorio.com/viewtopic.php?f=190&t=97907",
     "description": "A power armour equipment that allows players to teleport for a short distance. Equipment needs to be fully charged before it can be used. Range stacks with number of equipment used. Can't be used to teleport to other surfaces."
